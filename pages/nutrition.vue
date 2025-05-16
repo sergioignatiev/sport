@@ -43,6 +43,11 @@
 </template>
 
 <script lang="ts" setup>
+useSeoMeta({
+  title: 'Питание | Мой План',
+  description: 'Планируйте приёмы пищи, создавайте список покупок и отслеживайте рацион питания в соответствии с вашими целями.',
+})
+
 interface Meal {
   time: string
   meal: string

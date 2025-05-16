@@ -21,6 +21,11 @@
 </template>
 
 <script setup lang="ts">
+useSeoMeta({
+  title: 'Мой План — Тренировки, питание и показатели',
+  description: 'Личный спортивный портал: тренировки, питание, сон и отслеживание прогресса в одном месте.',
+})
+
 interface Section {
   to: string
   title: string

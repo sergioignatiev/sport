@@ -10,11 +10,11 @@
         type="date"
         v-model="selectedDate"
         class="border rounded px-3 py-2 w-full max-w-xs"
-        :class="{'ring-2 ring-yellow-500': hasWorkout(selectedDate)}"
+        :class="{ 'ring-2 ring-yellow-500': hasWorkout(selectedDate) }"
       />
     </div>
 
-    <!-- Таблица упражнений -->
+    <!-- Таблица -->
     <table class="w-full table-auto border border-gray-300 text-sm">
       <thead class="bg-gray-100">
         <tr>
@@ -22,6 +22,7 @@
           <th class="border px-2 py-2">Подходы</th>
           <th class="border px-2 py-2">Повторы</th>
           <th class="border px-2 py-2">Вес (кг)</th>
+          <th class="border px-2 py-2 text-center">Добавить в список</th>
           <th class="border px-2 py-2 text-center">Удалить</th>
         </tr>
       </thead>
@@ -63,6 +64,15 @@
           </td>
           <td class="border px-2 py-1 text-center">
             <button
+              @click="addToRecommended(exercise.name)"
+              class="text-green-600 hover:text-green-800 font-bold"
+              title="Добавить в список"
+            >
+              ➕
+            </button>
+          </td>
+          <td class="border px-2 py-1 text-center">
+            <button
               @click="removeExercise(index)"
               class="text-red-500 hover:text-red-700 font-bold"
               title="Удалить"
@@ -74,7 +84,7 @@
       </tbody>
     </table>
 
-    <!-- Кнопка добавить и счётчик -->
+    <!-- Общие действия -->
     <div class="mt-4 flex justify-between items-center">
       <button
         @click="addExercise"
@@ -85,7 +95,7 @@
       <p class="text-sm text-gray-500">Всего: {{ log[selectedDate]?.length || 0 }} упражнений</p>
     </div>
 
-    <!-- История тренировок -->
+    <!-- История -->
     <div class="mt-10">
       <h3 class="text-lg font-semibold mb-2 text-gray-800">📈 История тренировок:</h3>
       <ul class="space-y-2 text-sm text-gray-600">
@@ -99,7 +109,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, watch, computed, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted, watch } from 'vue'
 
 interface Exercise {
   name: string
@@ -108,40 +118,35 @@ interface Exercise {
   weight: number
 }
 
-type WorkoutLog = {
-  [date: string]: Exercise[]
-}
+type WorkoutLog = { [date: string]: Exercise[] }
 
 const today = new Date().toISOString().split('T')[0]
-const selectedDate = ref<string>(today)
+const selectedDate = ref(today)
+
+const log = reactive<WorkoutLog>({})
+const recommendedExercises = ref<string[]>([])
 
 const defaultExercises: Exercise[] = [
   { name: 'Приседания', sets: 3, reps: 8, weight: 75 },
   { name: 'Жим лёжа', sets: 3, reps: 8, weight: 70 },
 ]
 
-const recommendedExercises = [
-  'Приседания',
-  'Жим лёжа',
-  'Румынская тяга',
-  'Подтягивания',
-  'Тяга верхнего блока',
-  'Армейский жим',
-  'Становая тяга',
-  'Тяга гантели в наклоне',
-]
-
-const log = reactive<WorkoutLog>({})
-
+// Загрузка из локального хранилища
 onMounted(() => {
-  const saved = localStorage.getItem('trainingLog')
-  if (saved) {
-    Object.assign(log, JSON.parse(saved))
+  const savedLog = localStorage.getItem('trainingLog')
+  if (savedLog) {
+    Object.assign(log, JSON.parse(savedLog))
   } else {
     log[today] = JSON.parse(JSON.stringify(defaultExercises))
   }
+
+  const savedRec = localStorage.getItem('recommendedExercises')
+  recommendedExercises.value = savedRec
+    ? JSON.parse(savedRec)
+    : ['Приседания', 'Жим лёжа', 'Румынская тяга', 'Подтягивания', 'Тяга верхнего блока']
 })
 
+// Сохраняем в локальное хранилище
 watch(
   log,
   () => {
@@ -150,33 +155,34 @@ watch(
   { deep: true }
 )
 
+watch(
+  recommendedExercises,
+  () => {
+    localStorage.setItem('recommendedExercises', JSON.stringify(recommendedExercises.value))
+  },
+  { deep: true }
+)
+
 function addExercise(): void {
-  if (!log[selectedDate.value]) {
-    log[selectedDate.value] = []
-  }
-  log[selectedDate.value].push({
-    name: '',
-    sets: 3,
-    reps: 10,
-    weight: 0,
-  })
+  if (!log[selectedDate.value]) log[selectedDate.value] = []
+  log[selectedDate.value].push({ name: '', sets: 3, reps: 10, weight: 0 })
 }
 
 function removeExercise(index: number): void {
   log[selectedDate.value].splice(index, 1)
 }
 
-const sortedDates = computed(() =>
-  Object.keys(log).sort((a, b) => new Date(b).getTime() - new Date(a).getTime())
-)
+function addToRecommended(name: string): void {
+  if (name && !recommendedExercises.value.includes(name)) {
+    recommendedExercises.value.push(name)
+  }
+}
 
 function hasWorkout(date: string): boolean {
   return !!log[date] && log[date].length > 0
 }
-</script>
 
-<style scoped>
-input[type='date'].ring-2 {
-  outline: none;
-}
-</style>
+const sortedDates = computed(() =>
+  Object.keys(log).sort((a, b) => new Date(b).getTime() - new Date(a).getTime())
+)
+</script>

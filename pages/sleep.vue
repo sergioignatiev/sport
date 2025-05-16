@@ -12,6 +12,11 @@
 </template>
 
 <script lang="ts" setup>
+useSeoMeta({
+  title: 'Сон | Мой План',
+  description: 'График сна с учётом сменной работы. Следите за восстановлением и качеством отдыха.',
+})
+
 interface DaySleep {
   day: string
   sleep: string[]

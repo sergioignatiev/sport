@@ -1,5 +1,5 @@
 <template>
-  <div class="max-w-5xl mx-auto bg-white p-6 rounded-lg shadow-md mt-6">
+  <div class="max-w-5xl mx-auto bg-white p-6 mb-12 rounded-lg shadow-md mt-6">
     <h2 class="text-2xl font-bold mb-4 text-blue-700">📅 Тренировочный дневник</h2>
 
     <!-- Календарь -->
@@ -99,7 +99,11 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, watch, computed, onMounted } from 'vue'
+useSeoMeta({
+  title: 'Показатели | Мой План',
+  description: 'Фиксируйте вес, обхваты, проценты жира и силу, чтобы видеть свой рост и корректировать цели.',
+})
+
 
 interface Exercise {
   name: string
