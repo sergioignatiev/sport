@@ -9,6 +9,7 @@
         type="date"
         v-model="selectedDate"
         class="border rounded px-3 py-2 w-full max-w-xs"
+        :class="{ 'bg-yellow-100': hasWorkout(selectedDate) }"
       />
     </div>
 
@@ -29,7 +30,12 @@
           class="hover:bg-yellow-50 transition"
         >
           <td class="border px-2 py-1">
-            <input v-model="exercise.name" class="w-full border rounded px-2 py-1" />
+            <select v-model="exercise.name" class="w-full border rounded px-2 py-1">
+              <option disabled value="">Выберите упражнение</option>
+              <option v-for="option in recommendedExercises" :key="option" :value="option">
+                {{ option }}
+              </option>
+            </select>
           </td>
           <td class="border px-2 py-1">
             <input
@@ -73,7 +79,7 @@
         @click="addExercise"
         class="bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-2 px-4 rounded"
       >
-        ➕ Добавить упражнение
+        ➕ Добавить
       </button>
 
       <p class="text-sm text-gray-500">Всего: {{ log[selectedDate]?.length || 0 }} упражнений</p>
@@ -92,9 +98,9 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref, computed } from 'vue'
+import { ref, computed } from 'vue'
+import { useLocalStorage } from '@vueuse/core'
 
-// Тип упражнения
 interface Exercise {
   name: string
   sets: number
@@ -102,43 +108,47 @@ interface Exercise {
   weight: number
 }
 
-// Тип журнала по дате
-type WorkoutLog = {
-  [date: string]: Exercise[]
-}
+type WorkoutLog = Record<string, Exercise[]>
 
-// Инициализация
 const today = new Date().toISOString().split('T')[0]
-const selectedDate = ref<string>(today)
+const selectedDate = ref(today)
 
-// Основной журнал тренировок по датам
-const log = reactive<WorkoutLog>({
+const recommendedExercises = [
+  'Приседания',
+  'Жим лёжа',
+  'Румынская тяга',
+  'Подтягивания',
+  'Тяга верхнего блока'
+]
+
+const log = useLocalStorage<WorkoutLog>('workout-log', {
   [today]: [
     { name: 'Приседания', sets: 3, reps: 8, weight: 75 },
-    { name: 'Жим лёжа', sets: 3, reps: 8, weight: 70 },
-  ],
+    { name: 'Жим лёжа', sets: 3, reps: 8, weight: 70 }
+  ]
 })
 
-// Добавить упражнение на выбранную дату
 function addExercise(): void {
-  if (!log[selectedDate.value]) {
-    log[selectedDate.value] = []
+  if (!log.value[selectedDate.value]) {
+    log.value[selectedDate.value] = []
   }
-  log[selectedDate.value].push({
+  log.value[selectedDate.value].push({
     name: '',
     sets: 3,
     reps: 10,
-    weight: 0,
+    weight: 0
   })
 }
 
-// Удалить упражнение
 function removeExercise(index: number): void {
-  log[selectedDate.value].splice(index, 1)
+  log.value[selectedDate.value].splice(index, 1)
 }
 
-// Список всех дат с тренировками, отсортированный
 const sortedDates = computed(() =>
-  Object.keys(log).sort((a, b) => new Date(b).getTime() - new Date(a).getTime())
+  Object.keys(log.value).sort((a, b) => new Date(b).getTime() - new Date(a).getTime())
 )
+
+function hasWorkout(date: string): boolean {
+  return !!log.value[date]?.length
+}
 </script>

@@ -12,6 +12,7 @@
           <NuxtLink to="/training" class="hover:text-yellow-300">Тренировки</NuxtLink>
           <NuxtLink to="/nutrition" class="hover:text-yellow-300">Питание</NuxtLink>
           <NuxtLink to="/metrics" class="hover:text-yellow-300">Показатели</NuxtLink>
+             <NuxtLink to="/sleep" class="hover:text-yellow-300">Сон</NuxtLink>
         </div>
 
         <!-- Бургер -->
@@ -30,6 +31,7 @@
       <NuxtLink to="/training" class="block py-2 hover:text-yellow-300" @click="closeMenu">Тренировки</NuxtLink>
       <NuxtLink to="/nutrition" class="block py-2 hover:text-yellow-300" @click="closeMenu">Питание</NuxtLink>
       <NuxtLink to="/metrics" class="block py-2 hover:text-yellow-300" @click="closeMenu">Показатели</NuxtLink>
+      <NuxtLink to="/sleep" class="block py-2 hover:text-yellow-300" @click="closeMenu">Сон</NuxtLink>
     </div>
   </nav>
 </template>
