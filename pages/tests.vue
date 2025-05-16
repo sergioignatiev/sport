@@ -1,188 +1,97 @@
 <template>
-  <div class="max-w-5xl mx-auto bg-white p-6 rounded-lg shadow-md mt-6">
-    <h2 class="text-2xl font-bold mb-4 text-blue-700">📅 Тренировочный дневник</h2>
+  <div class="min-h-screen bg-white text-gray-900 px-4 py-8 flex flex-col items-center">
+    <WorkoutCountdown/>
 
-    <!-- Календарь -->
-    <div class="mb-4">
-      <label for="currentDate" class="block text-sm font-semibold mb-1">Дата тренировки:</label>
-      <input
-        id="currentDate"
-        type="date"
-        v-model="selectedDate"
-        class="border rounded px-3 py-2 w-full max-w-xs"
-        :class="{ 'ring-2 ring-yellow-500': hasWorkout(selectedDate) }"
-      />
+    <!-- Фильтр по дню -->
+    <div class="mb-6">
+      <label class="mr-2 font-semibold">Показать:</label>
+      <select v-model="selectedDay" class="border rounded px-3 py-1">
+        <option value="all">Все дни</option>
+        <option value="1">1-й выходной</option>
+        <option value="2">2-й выходной</option>
+        <option value="3">3-й выходной</option>
+      </select>
     </div>
 
-    <!-- Таблица -->
-    <table class="w-full table-auto border border-gray-300 text-sm">
-      <thead class="bg-gray-100">
-        <tr>
-          <th class="border px-2 py-2 text-left">Упражнение</th>
-          <th class="border px-2 py-2">Подходы</th>
-          <th class="border px-2 py-2">Повторы</th>
-          <th class="border px-2 py-2">Вес (кг)</th>
-          <th class="border px-2 py-2 text-center">Добавить в список</th>
-          <th class="border px-2 py-2 text-center">Удалить</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr
-          v-for="(exercise, index) in log[selectedDate] || []"
-          :key="index"
-          class="hover:bg-yellow-50 transition"
-        >
-          <td class="border px-2 py-1">
-            <select v-model="exercise.name" class="w-full border rounded px-2 py-1">
-              <option disabled value="">Выберите упражнение</option>
-              <option v-for="option in recommendedExercises" :key="option">{{ option }}</option>
-            </select>
-          </td>
-          <td class="border px-2 py-1">
-            <input
-              v-model.number="exercise.sets"
-              type="number"
-              min="1"
-              class="w-full border rounded px-2 py-1 text-center"
-            />
-          </td>
-          <td class="border px-2 py-1">
-            <input
-              v-model.number="exercise.reps"
-              type="number"
-              min="1"
-              class="w-full border rounded px-2 py-1 text-center"
-            />
-          </td>
-          <td class="border px-2 py-1">
-            <input
-              v-model.number="exercise.weight"
-              type="number"
-              min="0"
-              class="w-full border rounded px-2 py-1 text-center"
-            />
-          </td>
-          <td class="border px-2 py-1 text-center">
-            <button
-              @click="addToRecommended(exercise.name)"
-              class="text-green-600 hover:text-green-800 font-bold"
-              title="Добавить в список"
-            >
-              ➕
-            </button>
-          </td>
-          <td class="border px-2 py-1 text-center">
-            <button
-              @click="removeExercise(index)"
-              class="text-red-500 hover:text-red-700 font-bold"
-              title="Удалить"
-            >
-              ✖
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-
-    <!-- Общие действия -->
-    <div class="mt-4 flex justify-between items-center">
-      <button
-        @click="addExercise"
-        class="bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-2 px-4 rounded"
+    <!-- Тренировки -->
+    <div class="grid gap-6 w-full max-w-3xl">
+      <div
+        v-for="(session, index) in filteredSessions"
+        :key="index"
+        :class="[
+          'border-l-4 p-4 rounded shadow',
+          session.day === currentDay ? 'bg-yellow-200 border-yellow-600' : 'bg-yellow-100 border-yellow-500'
+        ]"
       >
-        ➕ Добавить
-      </button>
-      <p class="text-sm text-gray-500">Всего: {{ log[selectedDate]?.length || 0 }} упражнений</p>
-    </div>
-
-    <!-- История -->
-    <div class="mt-10">
-      <h3 class="text-lg font-semibold mb-2 text-gray-800">📈 История тренировок:</h3>
-      <ul class="space-y-2 text-sm text-gray-600">
-        <li v-for="date in sortedDates" :key="date">
-          <strong>{{ date }}:</strong>
-          {{ log[date].length }} упражнений
-        </li>
-      </ul>
+        <img
+          v-if="session.image"
+          :src="session.image"
+          :alt="session.name"
+          class="w-full h-48 object-cover rounded mb-4"
+        />
+        <h2 class="text-2xl font-bold mb-2">{{ session.name }}</h2>
+        <p class="italic text-gray-700 mb-2">{{ session.description }}</p>
+        <ul class="list-disc pl-5 space-y-1">
+          <li v-for="(exercise, i) in session.exercises" :key="i">{{ exercise }}</li>
+        </ul>
+      </div>
     </div>
   </div>
 </template>
 
-<script lang="ts" setup>
-import { ref, reactive, computed, onMounted, watch } from 'vue'
-
-interface Exercise {
-  name: string
-  sets: number
-  reps: number
-  weight: number
-}
-
-type WorkoutLog = { [date: string]: Exercise[] }
-
-const today = new Date().toISOString().split('T')[0]
-const selectedDate = ref(today)
-
-const log = reactive<WorkoutLog>({})
-const recommendedExercises = ref<string[]>([])
-
-const defaultExercises: Exercise[] = [
-  { name: 'Приседания', sets: 3, reps: 8, weight: 75 },
-  { name: 'Жим лёжа', sets: 3, reps: 8, weight: 70 },
-]
-
-// Загрузка из локального хранилища
-onMounted(() => {
-  const savedLog = localStorage.getItem('trainingLog')
-  if (savedLog) {
-    Object.assign(log, JSON.parse(savedLog))
-  } else {
-    log[today] = JSON.parse(JSON.stringify(defaultExercises))
-  }
-
-  const savedRec = localStorage.getItem('recommendedExercises')
-  recommendedExercises.value = savedRec
-    ? JSON.parse(savedRec)
-    : ['Приседания', 'Жим лёжа', 'Румынская тяга', 'Подтягивания', 'Тяга верхнего блока']
+<script setup>
+useSeoMeta({
+  title: 'Тренировки | Мой План',
+  description: 'Ведите тренировочный дневник: добавляйте упражнения, отслеживайте прогресс, стройте программу тренировок.',
 })
 
-// Сохраняем в локальное хранилище
-watch(
-  log,
-  () => {
-    localStorage.setItem('trainingLog', JSON.stringify(log))
+const currentDay = 1
+const selectedDay = ref('all')
+
+const trainingSessions = [
+  {
+    day: 1,
+    name: 'Тренировка A (Full Body — 1-й выходной)',
+    description: 'Базовая силовая тренировка',
+    image: 'https://images.pexels.com/photos/2261477/pexels-photo-2261477.jpeg',
+    exercises: [
+      'Присед: 3×8×75 кг',
+      'Жим лёжа: 3×8×70 кг',
+      'Тяга в наклоне: 3×8–10 (50–55 кг)',
+      'Сгибания рук на бицепс: 3×10–12',
+      'Кор: планка и скручивания',
+    ],
   },
-  { deep: true }
-)
-
-watch(
-  recommendedExercises,
-  () => {
-    localStorage.setItem('recommendedExercises', JSON.stringify(recommendedExercises.value))
+  {
+    day: 3,
+    name: 'Тренировка B (2-й или 3-й выходной)',
+    description: 'Силовой упор на спину, грудь и плечи',
+    image: 'https://images.pexels.com/photos/4164767/pexels-photo-4164767.jpeg',
+    exercises: [
+      'Румынская тяга: 4×8×70 кг',
+      'Жим гантелей под углом: 3×8–10',
+      'Подтягивания: 3 подхода (по 4 повт.)',
+      'Жим сидя гантелями: 3×10',
+      'Подъёмы ног в висе',
+    ],
   },
-  { deep: true }
-)
+  {
+    day: 0,
+    name: 'Тренировка C (по желанию, лёгкая)',
+    description: 'Лёгкая проработка вспомогательных мышц + кор',
+    image: 'https://images.pexels.com/photos/1552242/pexels-photo-1552242.jpeg',
+    exercises: [
+      'Становая тяга с пустым грифом: 3×15',
+      'Подъёмы на носки стоя: 4×20',
+      'Французский жим: 3×10',
+      'Тяга блока одной рукой: 3×12',
+      'Ролик на пресс и растяжка',
+    ],
+  },
+]
 
-function addExercise(): void {
-  if (!log[selectedDate.value]) log[selectedDate.value] = []
-  log[selectedDate.value].push({ name: '', sets: 3, reps: 10, weight: 0 })
-}
-
-function removeExercise(index: number): void {
-  log[selectedDate.value].splice(index, 1)
-}
-
-function addToRecommended(name: string): void {
-  if (name && !recommendedExercises.value.includes(name)) {
-    recommendedExercises.value.push(name)
-  }
-}
-
-function hasWorkout(date: string): boolean {
-  return !!log[date] && log[date].length > 0
-}
-
-const sortedDates = computed(() =>
-  Object.keys(log).sort((a, b) => new Date(b).getTime() - new Date(a).getTime())
-)
+const filteredSessions = computed(() => {
+  if (selectedDay.value === 'all') return trainingSessions
+  return trainingSessions.filter((session) => session.day == selectedDay.value)
+})
 </script>
