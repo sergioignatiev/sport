@@ -2,6 +2,7 @@
   <div class="max-w-5xl mx-auto bg-white p-6 rounded-lg shadow-md mt-6">
     <h2 class="text-2xl font-bold mb-4 text-blue-700">📅 Тренировочный дневник</h2>
 
+    <!-- Календарь -->
     <div class="mb-4">
       <label for="currentDate" class="block text-sm font-semibold mb-1">Дата тренировки:</label>
       <input
@@ -9,10 +10,11 @@
         type="date"
         v-model="selectedDate"
         class="border rounded px-3 py-2 w-full max-w-xs"
-        :class="{ 'bg-yellow-100': hasWorkout(selectedDate) }"
+        :class="{'ring-2 ring-yellow-500': hasWorkout(selectedDate)}"
       />
     </div>
 
+    <!-- Таблица упражнений -->
     <table class="w-full table-auto border border-gray-300 text-sm">
       <thead class="bg-gray-100">
         <tr>
@@ -32,9 +34,7 @@
           <td class="border px-2 py-1">
             <select v-model="exercise.name" class="w-full border rounded px-2 py-1">
               <option disabled value="">Выберите упражнение</option>
-              <option v-for="option in recommendedExercises" :key="option" :value="option">
-                {{ option }}
-              </option>
+              <option v-for="option in recommendedExercises" :key="option">{{ option }}</option>
             </select>
           </td>
           <td class="border px-2 py-1">
@@ -74,6 +74,7 @@
       </tbody>
     </table>
 
+    <!-- Кнопка добавить и счётчик -->
     <div class="mt-4 flex justify-between items-center">
       <button
         @click="addExercise"
@@ -81,10 +82,10 @@
       >
         ➕ Добавить
       </button>
-
       <p class="text-sm text-gray-500">Всего: {{ log[selectedDate]?.length || 0 }} упражнений</p>
     </div>
 
+    <!-- История тренировок -->
     <div class="mt-10">
       <h3 class="text-lg font-semibold mb-2 text-gray-800">📈 История тренировок:</h3>
       <ul class="space-y-2 text-sm text-gray-600">
@@ -98,8 +99,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed } from 'vue'
-import { useLocalStorage } from '@vueuse/core'
+import { ref, reactive, watch, computed, onMounted } from 'vue'
 
 interface Exercise {
   name: string
@@ -108,47 +108,75 @@ interface Exercise {
   weight: number
 }
 
-type WorkoutLog = Record<string, Exercise[]>
+type WorkoutLog = {
+  [date: string]: Exercise[]
+}
 
 const today = new Date().toISOString().split('T')[0]
-const selectedDate = ref(today)
+const selectedDate = ref<string>(today)
+
+const defaultExercises: Exercise[] = [
+  { name: 'Приседания', sets: 3, reps: 8, weight: 75 },
+  { name: 'Жим лёжа', sets: 3, reps: 8, weight: 70 },
+]
 
 const recommendedExercises = [
   'Приседания',
   'Жим лёжа',
   'Румынская тяга',
   'Подтягивания',
-  'Тяга верхнего блока'
+  'Тяга верхнего блока',
+  'Армейский жим',
+  'Становая тяга',
+  'Тяга гантели в наклоне',
 ]
 
-const log = useLocalStorage<WorkoutLog>('workout-log', {
-  [today]: [
-    { name: 'Приседания', sets: 3, reps: 8, weight: 75 },
-    { name: 'Жим лёжа', sets: 3, reps: 8, weight: 70 }
-  ]
+const log = reactive<WorkoutLog>({})
+
+onMounted(() => {
+  const saved = localStorage.getItem('trainingLog')
+  if (saved) {
+    Object.assign(log, JSON.parse(saved))
+  } else {
+    log[today] = JSON.parse(JSON.stringify(defaultExercises))
+  }
 })
 
+watch(
+  log,
+  () => {
+    localStorage.setItem('trainingLog', JSON.stringify(log))
+  },
+  { deep: true }
+)
+
 function addExercise(): void {
-  if (!log.value[selectedDate.value]) {
-    log.value[selectedDate.value] = []
+  if (!log[selectedDate.value]) {
+    log[selectedDate.value] = []
   }
-  log.value[selectedDate.value].push({
+  log[selectedDate.value].push({
     name: '',
     sets: 3,
     reps: 10,
-    weight: 0
+    weight: 0,
   })
 }
 
 function removeExercise(index: number): void {
-  log.value[selectedDate.value].splice(index, 1)
+  log[selectedDate.value].splice(index, 1)
 }
 
 const sortedDates = computed(() =>
-  Object.keys(log.value).sort((a, b) => new Date(b).getTime() - new Date(a).getTime())
+  Object.keys(log).sort((a, b) => new Date(b).getTime() - new Date(a).getTime())
 )
 
 function hasWorkout(date: string): boolean {
-  return !!log.value[date]?.length
+  return !!log[date] && log[date].length > 0
 }
 </script>
+
+<style scoped>
+input[type='date'].ring-2 {
+  outline: none;
+}
+</style>
