@@ -36,7 +36,7 @@ const sections: Section[] = [
   {
     to: '/training',
     title: 'Тренировки',
-    image: 'https://images.pexels.com/photos/1552249/pexels-photo-1552249.jpeg',
+    image: 'training.jpeg',
   },
   {
     to: '/nutrition',
