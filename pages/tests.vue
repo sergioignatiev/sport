@@ -1,7 +1,6 @@
-<template> <div class="max-w-5xl mx-auto bg-white p-4 sm:p-6 mb-12 rounded-lg shadow-md mt-6"> <h2 class="text-2xl font-bold mb-4 text-blue-700">📅 Тренировочный дневник</h2>
-php-template
-Copy
-Edit
+<template> 
+<div class="max-w-5xl mx-auto bg-white p-4 sm:p-6 mb-12 rounded-lg shadow-md mt-6"> <h2 class="text-2xl font-bold mb-4 text-blue-700">📅 Тренировочный дневник</h2>
+
 <!-- Календарь -->
 <div class="mb-4">
   <label for="currentDate" class="block text-sm font-semibold mb-1">Дата тренировки:</label>

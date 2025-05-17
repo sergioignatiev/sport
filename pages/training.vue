@@ -32,8 +32,12 @@
 
 <script setup>
 useSeoMeta({
-  title: 'Тренировки | Мой План',
-  description: 'Ведите тренировочный дневник: добавляйте упражнения, отслеживайте прогресс, стройте программу тренировок.',
+  title: 'Тренировки',
+  description: 'Трекер тренировок и питания для набора массы',
+  ogTitle: 'Мой фитнес-план',
+  ogDescription: 'Создавай, отслеживай и совершенствуй свою программу тренировок',
+  ogImage: '/training.jpeg',
+  twitterCard: 'summary_large_image',
 })
 
 const currentDay = 1
