@@ -3,7 +3,7 @@
     <div class="max-w-6xl mx-auto px-4">
       <div class="flex justify-between items-center h-14">
         <!-- Логотип -->
-        <NuxtLink to="/" class="text-xl font-bold tracking-wide hover:text-yellow-200">
+        <NuxtLink to="/" class="text-xl font-bold tracking-wide hover:text-yellow-200" >
           🏋️ Мой План
         </NuxtLink>
 

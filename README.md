@@ -73,3 +73,5 @@ bun run preview
 ```
 
 Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+image i am experementing with 
+https://images.pexels.com/photos/1552249/pexels-photo-1552249.jpeg

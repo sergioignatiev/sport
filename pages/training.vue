@@ -2,16 +2,7 @@
   <div class="min-h-screen bg-white text-gray-900 px-4 py-8 flex flex-col items-center">
     <WorkoutCountdown/>
 
-    <!-- Фильтр по дню -->
-    <div class="mb-6">
-      <label class="mr-2 font-semibold">Показать:</label>
-      <select v-model="selectedDay" class="border rounded px-3 py-1">
-        <option value="all">Все дни</option>
-        <option value="1">1-й выходной</option>
-        <option value="2">2-й выходной</option>
-        <option value="3">3-й выходной</option>
-      </select>
-    </div>
+   
 
     <!-- Тренировки -->
     <div class="grid gap-6 w-full max-w-3xl">
@@ -23,6 +14,12 @@
           session.day === currentDay ? 'bg-yellow-200 border-yellow-600' : 'bg-yellow-100 border-yellow-500'
         ]"
       >
+        <img
+          v-if="session.image"
+          :src="session.image"
+          :alt="session.name"
+          class="w-full h-48 object-cover rounded mb-4"
+        />
         <h2 class="text-2xl font-bold mb-2">{{ session.name }}</h2>
         <p class="italic text-gray-700 mb-2">{{ session.description }}</p>
         <ul class="list-disc pl-5 space-y-1">
@@ -39,12 +36,7 @@ useSeoMeta({
   description: 'Ведите тренировочный дневник: добавляйте упражнения, отслеживайте прогресс, стройте программу тренировок.',
 })
 
-
-// Текущий день (для подсветки текущей тренировки)
-// Предположим, сегодня 1-й выходной
 const currentDay = 1
-
-// Селектор фильтра
 const selectedDay = ref('all')
 
 const trainingSessions = [
@@ -52,6 +44,7 @@ const trainingSessions = [
     day: 1,
     name: 'Тренировка A (Full Body — 1-й выходной)',
     description: 'Базовая силовая тренировка',
+    image: 'https://images.pexels.com/photos/2261477/pexels-photo-2261477.jpeg',
     exercises: [
       'Присед: 3×8×75 кг',
       'Жим лёжа: 3×8×70 кг',
@@ -64,6 +57,7 @@ const trainingSessions = [
     day: 3,
     name: 'Тренировка B (2-й или 3-й выходной)',
     description: 'Силовой упор на спину, грудь и плечи',
+    image: 'https://images.pexels.com/photos/4164767/pexels-photo-4164767.jpeg',
     exercises: [
       'Румынская тяга: 4×8×70 кг',
       'Жим гантелей под углом: 3×8–10',
@@ -73,9 +67,10 @@ const trainingSessions = [
     ],
   },
   {
-    day: 0, // тренировочный день по желанию, без жёсткой привязки
+    day: 0,
     name: 'Тренировка C (по желанию, лёгкая)',
     description: 'Лёгкая проработка вспомогательных мышц + кор',
+    image: 'https://images.pexels.com/photos/1552242/pexels-photo-1552242.jpeg',
     exercises: [
       'Становая тяга с пустым грифом: 3×15',
       'Подъёмы на носки стоя: 4×20',
