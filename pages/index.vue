@@ -1,19 +1,19 @@
 <template>
   <div class="min-h-screen bg-white text-gray-900 px-4 py-8 flex flex-col items-center">
-    <div class="grid gap-8 w-full max-w-5xl">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 w-full max-w-7xl">
       <NuxtLink
         v-for="item in sections"
         :key="item.to"
         :to="item.to"
-        class="group relative overflow-hidden rounded-lg shadow-lg hover:shadow-2xl transition duration-300"
+        class="group relative overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition duration-300"
       >
         <img
           :src="item.image"
           :alt="item.title"
           class="w-full h-72 object-cover group-hover:scale-105 transition-transform duration-300"
         />
-        <div class="absolute inset-0 flex items-center justify-center">
-          <span class="text-4xl font-extrabold text-white drop-shadow-lg">{{ item.title }}</span>
+        <div class="absolute inset-0 flex items-center justify-center bg-black/30">
+          <span class="text-3xl sm:text-4xl font-extrabold text-white drop-shadow-xl text-center px-4">{{ item.title }}</span>
         </div>
       </NuxtLink>
     </div>
@@ -22,8 +22,8 @@
 
 <script setup lang="ts">
 useSeoMeta({
-  title: 'Мой План — Тренировки, питание и показатели',
-  description: 'Личный спортивный портал: тренировки, питание, сон и отслеживание прогресса в одном месте.',
+  title: 'Мой План — Всё в одном: спорт, здоровье и язык',
+  description: 'Тренировки, питание, сон, восстановление, здоровье и изучение испанского — всё на одной странице.',
 })
 
 interface Section {
@@ -51,7 +51,22 @@ const sections: Section[] = [
   {
     to: '/sleep',
     title: 'Сон',
-    image: 'https://images.pexels.com/photos/935743/pexels-photo-935743.jpeg', // Новая картинка
+    image: 'https://images.pexels.com/photos/935743/pexels-photo-935743.jpeg',
+  },
+  {
+    to: '/recovery',
+    title: 'Восстановление',
+    image: 'https://images.pexels.com/photos/7585611/pexels-photo-7585611.jpeg',
+  },
+  {
+    to: '/checklist',
+    title: 'Чеклист здоровья',
+    image: 'https://images.pexels.com/photos/3873196/pexels-photo-3873196.jpeg',
+  },
+  {
+    to: '/espanol',
+    title: 'Español',
+    image: 'https://c8.alamy.com/comp/FX84F6/spanish-architecture-casa-del-prado-in-balboa-park-san-diego-ca-this-FX84F6.jpg',
   },
 ]
 </script>
