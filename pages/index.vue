@@ -41,32 +41,32 @@ const sections: Section[] = [
   {
     to: '/nutrition',
     title: 'Питание',
-    image: 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg',
+    image: 'nutrition.jpeg',
   },
   {
     to: '/metrics',
     title: 'Показатели',
-    image: 'https://images.pexels.com/photos/267394/pexels-photo-267394.jpeg',
+    image: 'metrics.jpeg',
   },
   {
     to: '/sleep',
     title: 'Сон',
-    image: 'https://images.pexels.com/photos/935743/pexels-photo-935743.jpeg',
+    image: 'sleep.jpeg',
   },
   {
     to: '/recovery',
     title: 'Восстановление',
-    image: 'https://images.pexels.com/photos/7585611/pexels-photo-7585611.jpeg',
+    image: 'recovery.jpeg',
   },
   {
     to: '/checklist',
     title: 'Чеклист здоровья',
-    image: 'https://images.pexels.com/photos/3873196/pexels-photo-3873196.jpeg',
+    image: 'checklist.jpeg',
   },
   {
     to: '/espanol',
     title: 'Español',
-    image: 'https://c8.alamy.com/comp/FX84F6/spanish-architecture-casa-del-prado-in-balboa-park-san-diego-ca-this-FX84F6.jpg',
+    image: 'espana.png',
   },
 ]
 </script>
