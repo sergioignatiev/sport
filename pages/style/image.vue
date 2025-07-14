@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>IS EMPTY</h1>
+    <img src="/assets/images/style.png" alt="style">
   </div>
 </template>
 
