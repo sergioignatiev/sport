@@ -1,7 +1,7 @@
 <template>
   <div>
     <NuxtLink to="/training">HOME</NuxtLink>
-<NuxtLink to="/training/vacation">VACATION</NuxtLink>
+<NuxtLink to="/training/vacation">VACATIONs</NuxtLink>
     <NuxtPage />
   </div>
 </template>
